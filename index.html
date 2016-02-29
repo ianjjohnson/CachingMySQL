@@ -44,6 +44,10 @@
 <p>The first method is to have your SQL database cache the query internally using SQL 'hints' inside of database queries. 
 This can be achieved using the <code>MYSQLND_QC_ENABLE_SWITCH</code> hint, which, when wrapped inside an SQL query, tells the DBMS to save the output of that query for future use.</p>
 
+<pre><code>//The MYSQLND_QC_ENABLE_SWITCH flag at the start of the query tells SQL to cache the result.
+$select = $db-&gt;query("/*" . MYSQLND_QC_ENABLE_SWITCH . "*/" . "SELECT * FROM table");
+</code></pre>
+
 <h3>
 <a id="caching-in-the-php-environment" class="anchor" href="#caching-in-the-php-environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching in the PHP environment</h3>
 
@@ -55,10 +59,11 @@ $key = 'some SQL query'; //This is the key for a key-value pair in the cache obj
 $result = $cache-&gt;get($key); //See if there's data for this query in the cache
 //If there's nothing in the cache, we need to query the SQL server
 if (!$result) {
- //Execute the query on SQL server
- $select = db-&gt;query("SELECT first_name FROM employee where last_name = 'bob'"); 
- $result = $select-&gt;fetchAll(PDO::FETCH_OBJ); //Fetch result 
- $cache-&gt;set($key, serialize($row)); //Load the result into the cache
+
+    //Execute the query on SQL server
+    $select = db-&gt;query("SELECT first_name FROM employee where last_name = 'bob'"); 
+    $result = $select-&gt;fetchAll(PDO::FETCH_OBJ); //Fetch result 
+    $cache-&gt;set($key, serialize($row)); //Load the result into the cache
 
 }
 </code></pre>
