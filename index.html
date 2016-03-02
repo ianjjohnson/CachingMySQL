@@ -33,10 +33,10 @@
 <a id="caching-on-the-sql-server" class="anchor" href="#caching-on-the-sql-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching on the SQL server</h2>
 
 <p>The first method is to have your SQL database cache the query internally using SQL 'hints' inside of database queries. 
-This can be achieved using the <code>MYSQLND_QC_ENABLE_SWITCH</code> hint, which, when wrapped inside an SQL query, tells the DBMS to save the output of that query for future use.</p>
+This can be achieved using the <code>SQL_CACHE</code> hint, which, when wrapped inside an SQL SELECT query, tells the DBMS to save the output of that query for future use.</p>
 
-<pre><code>//The MYSQLND_QC_ENABLE_SWITCH flag at the start of the query tells SQL to cache the result.
-$select = $db-&gt;query("/*" . MYSQLND_QC_ENABLE_SWITCH . "*/" . "SELECT * FROM table");
+<pre><code>//The SQL_CACHE flag at the start of the query tells SQL to cache the result.
+$select = $db-&gt;query("SELECT SQL_CACHE * FROM table");
 </code></pre>
 
 <p>Subsequent queries to the database with the same query meaning (e.g. anything which provides the same functionality as 'select * from table' in this case) will return the cached result from the SQL server unless something has changed on the server side.</p>
@@ -71,7 +71,6 @@ if (!$result) {
     $select = $db-&gt;query("SELECT first_name FROM employee where last_name = 'bob'"); 
     $result = $select-&gt;fetchAll(PDO::FETCH_OBJ); //Fetch result 
     $cache-&gt;set($key, serialize($row)); //Load the result into the cache
-
 }
 </code></pre>
 
