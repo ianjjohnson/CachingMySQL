@@ -27,10 +27,10 @@
 <h1>
 <a id="how-can-i-cache-sql-queries" class="anchor" href="#how-can-i-cache-sql-queries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How Can I Cache SQL Queries?</h1>
 
-<p>SQL queries can be cached in one of two ways -- they can be cached SQL-server side, or 'locally' inside the PHP script which is querying the database. </p>
+<p>SQL queries can be cached in one of two ways -- they can be cached SQL-server side, or 'locally' inside the PHP script which is querying the database. In this demo, we'll explore both ways to use caching assuming you've already built a PDO object called db which connects to your SQL database. It is assumed that a reader is running Ubuntu 14, has the LAMP stack installed, and has a reasonable level of aptitude with the Linux terminal.</p>
 
-<h3>
-<a id="caching-on-the-sql-server" class="anchor" href="#caching-on-the-sql-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching on the SQL server</h3>
+<h2>
+<a id="caching-on-the-sql-server" class="anchor" href="#caching-on-the-sql-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching on the SQL server</h2>
 
 <p>The first method is to have your SQL database cache the query internally using SQL 'hints' inside of database queries. 
 This can be achieved using the <code>MYSQLND_QC_ENABLE_SWITCH</code> hint, which, when wrapped inside an SQL query, tells the DBMS to save the output of that query for future use.</p>
@@ -41,20 +41,34 @@ $select = $db-&gt;query("/*" . MYSQLND_QC_ENABLE_SWITCH . "*/" . "SELECT * FROM 
 
 <p>Subsequent queries to the database with the same query meaning (e.g. anything which provides the same functionality as 'select * from table' in this case) will return the cached result from the SQL server unless something has changed on the server side.</p>
 
-<h3>
-<a id="caching-in-the-php-environment" class="anchor" href="#caching-in-the-php-environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching in the PHP environment</h3>
+<h2>
+<a id="caching-in-the-php-environment" class="anchor" href="#caching-in-the-php-environment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caching in the PHP environment</h2>
 
 <p>The second method is to save the results of a SQL query inside an associative array in the cache of a PHP process. This can be achieved using a library called <code>Memcached</code> which allows a PHP user to store data in local cache.</p>
 
+<h3>
+<a id="installing-memcached" class="anchor" href="#installing-memcached" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing Memcached</h3>
+
+<p>Installing Memcached is very simple. Simply use any package manager to install <code>php5-memcached</code>. 
+For example, use <code>sudo apt-get install php5-memcached</code>.
+This will automatically install and configure Memcached. A more in depth tutorial on Memcached and its settings can be found on <a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-memcache-on-ubuntu-14-04">Digital Ocean's help site</a>, but for this example you won't need to modify any Memcached settings.</p>
+
+<h3>
+<a id="using-memcached" class="anchor" href="#using-memcached" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using Memcached</h3>
+
+<p>In the following code snippet a Memcached object is constructed and connected </p>
+
 <pre><code>$cache = new Memcached(); //Build a new memcached object
 $cache-&gt;addServer('localhost', 11211); //11211 should always be the second parameter
+    //(read the Memcached settings article above for a more in-depth explanation)
+
 $key = 'some SQL query'; //This is the key for a key-value pair in the cache object
 $result = $cache-&gt;get($key); //See if there's data for this query in the cache
+
 //If there's nothing in the cache, we need to query the SQL server
 if (!$result) {
-
     //Execute the query on SQL server
-    $select = db-&gt;query("SELECT first_name FROM employee where last_name = 'bob'"); 
+    $select = $db-&gt;query("SELECT first_name FROM employee where last_name = 'bob'"); 
     $result = $select-&gt;fetchAll(PDO::FETCH_OBJ); //Fetch result 
     $cache-&gt;set($key, serialize($row)); //Load the result into the cache
 
@@ -66,7 +80,7 @@ if (!$result) {
 <h3>
 <a id="cool-now-show-me-the-code" class="anchor" href="#cool-now-show-me-the-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cool. Now show me the code!</h3>
 
-<p>Check out this repository to see a simple example of both SQL-side caching and PHP-side caching!</p>
+<p>Check out <a href="github.com/ianjjohnson/CachingMySQL">this repository</a> to see a simple example of both SQL-side caching and PHP-side caching!</p>
 
 <h3>
 <a id="sql-side-troubles" class="anchor" href="#sql-side-troubles" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SQL-Side troubles?</h3>
